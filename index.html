@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MENS ZONE FASHION | Premium Cloud Store</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23D4A44C' d='M211 7.3C205 1 196-1.7 187.6 1.1L81.2 36.6c-5.8 1.9-10.3 6.6-12 12.5L2.8 245.5c-2.4 8.4 0 17.5 6.2 23.4l132 126c6 5.7 14.3 8.1 22.4 6.3l120-27c7.8-1.8 14-7.5 16.2-15.2l48-168c2.6-9.1-1.1-18.8-9.1-23.7L211 7.3z'/></svg>">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#111827',
+                            gold: '#D4A44C',
+                            goldHover: '#B8883B',
+                            slate: '#1E293B',
+                            cardBg: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase Cloud SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
+        .font-english { font-family: 'Inter', sans-serif; }
+        .gold-text {
+            background: linear-gradient(135deg, #E5C178 0%, #D4A44C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @media print {
+            body * { visibility: hidden; }
+            #printableInvoiceModal, #printableInvoiceModal *,
+            #printableReportModal, #printableReportModal * { visibility: visible; }
+            #printableInvoiceModal, #printableReportModal {
+                position: absolute; left: 0; top: 0; width: 100%; height: auto; background: white; padding: 0; margin: 0;
+            }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-amber-200 selection:text-slate-900">
+
+    <!-- Header / Navbar -->
+    <header class="bg-brand-dark text-white sticky top-0 z-40 shadow-xl border-b border-slate-800 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="scrollToProducts(); filterCategory('Panjabi');">
+                <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 w-11 h-11 rounded-xl font-black text-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition transform">
+                    <i class="fa-solid fa-crown" aria-hidden="true"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black tracking-wider uppercase font-english text-amber-400">
+                        MENS ZONE <span class="text-white">FASHION</span>
+                    </h1>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest hidden sm:block font-english">Premium Wear & Lifestyle</p>
+                </div>
+            </div>
+
+            <!-- Desktop Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md relative">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search by item name, size or batch no..." class="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700 rounded-full focus:outline-none focus:border-amber-400 text-xs text-white placeholder-gray-400 transition shadow-inner">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-xs" aria-hidden="true"></i>
+            </div>
+
+            <!-- Header Actions (Right Side Corner) -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Mobile Search Toggle Button -->
+                <button onclick="toggleMobileSearch()" class="md:hidden text-gray-300 hover:text-amber-400 p-2 text-lg">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                </button>
+
+                <!-- Dashboard Trigger Button (When Logged In) -->
+                <button id="dashboardBtn" onclick="toggleDashboardModal()" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-950 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition shadow">
+                    <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+                    <span id="roleLabel" class="uppercase">Dashboard</span>
+                </button>
+
+                <!-- Dedicated ADMIN Portal Button (Top Right) -->
+                <div id="authStatusBox">
+                    <button onclick="toggleAuthModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition shadow transform active:scale-95">
+                        <i class="fa-solid fa-user-lock" aria-hidden="true"></i>
+                        <span>ADMIN</span>
+                    </button>
+                </div>
+
+                <!-- Shopping Cart Button -->
+                <button onclick="toggleCartModal()" class="relative bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition shadow-lg transform active:scale-95">
+                    <i class="fa-solid fa-bag-shopping text-base" aria-hidden="true"></i>
+                    <span class="hidden sm:inline font-english">Cart</span>
+                    <span id="cartCount" class="bg-slate-900 text-amber-400 text-xs px-2 py-0.5 rounded-full font-extrabold shadow">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Search Dropdown -->
+        <div id="mobileSearchBox" class="hidden md:hidden px-4 pb-3 border-t border-slate-800 pt-2">
+            <div class="relative w-full">
+                <input type="text" id="searchInputMobile" oninput="handleSearchMobile()" placeholder="Search name, size or batch..." class="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-400">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-xs" aria-hidden="true"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Categories Bar -->
+    <nav class="bg-white border-b border-gray-200 sticky top-20 z-30 shadow-sm no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between overflow-x-auto py-3 gap-2 scrollbar-none">
+            <div class="flex items-center gap-2">
+                <button onclick="filterCategory('Panjabi')" class="cat-btn font-bold text-xs sm:text-sm px-5 py-2 rounded-xl border border-amber-500 bg-slate-900 text-amber-400 whitespace-nowrap transition shadow-sm flex items-center gap-2" data-cat="Panjabi">
+                    <span>👑</span> Panjabi
+                </button>
+                <button onclick="filterCategory('T-Shirt')" class="cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2" data-cat="T-Shirt">
+                    <span>👕</span> T-Shirt
+                </button>
+                <button onclick="filterCategory('Polo Shirt')" class="cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2" data-cat="Polo Shirt">
+                    <span>👔</span> Polo Shirt
+                </button>
+                <button onclick="filterCategory('Shirt')" class="cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2" data-cat="Shirt">
+                    <span>👔</span> Shirt
+                </button>
+            </div>
+
+            <!-- Sorting Select Dropdown -->
+            <div class="flex items-center gap-2 min-w-max pl-4 border-l border-gray-200">
+                <label for="sortSelect" class="text-xs font-bold text-gray-500 hidden sm:inline"><i class="fa-solid fa-arrow-down-short-wide mr-1" aria-hidden="true"></i>Sort By:</label>
+                <select id="sortSelect" onchange="handleSortChange()" class="text-xs font-bold text-slate-800 bg-gray-100 border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                    <option value="default">Default (Newest First)</option>
+                    <option value="lowToHigh">Price: Low to High</option>
+                    <option value="highToLow">Price: High to Low</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO BANNER SECTION -->
+    <section class="bg-slate-950 text-white relative overflow-hidden border-b border-amber-500/20 no-print">
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-slate-950/70 z-10"></div>
+        <div class="absolute inset-0 bg-cover bg-center opacity-30 scale-105 transform transition duration-1000" style="background-image: url('https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1600&auto=format&fit=crop');"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-20 flex flex-col items-center text-center space-y-6">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-widest font-english">
+                <i class="fa-solid fa-sparkles" aria-hidden="true"></i> New Arrival Collection 2026
+            </span>
+            <h2 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight font-english text-white max-w-4xl leading-tight">
+                Upgrade Your Style, <span class="gold-text">Define Your Identity.</span>
+            </h2>
+            <p class="text-sm sm:text-base text-gray-300 max-w-2xl font-light">
+                Exclusive collection of premium Panjabi, T-Shirts, Polo Shirts & Shirts. Fine fabrics, perfect fits, and elevated everyday style.
+            </p>
+            <button onclick="scrollToProducts()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-xl transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                <span>Shop Now</span> <i class="fa-solid fa-arrow-right-long text-xs" aria-hidden="true"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main id="productsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full no-print">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 border-b border-gray-200 pb-4">
+            <div>
+                <h2 id="categoryHeader" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Panjabi Collection</h2>
+                <p class="text-xs text-gray-500">Select your preferred item by batch number and size</p>
+            </div>
+            <div class="text-xs font-bold text-gray-500">
+                Showing: <span id="displayedCount" class="text-amber-600 font-extrabold">0</span> Items
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+    </main>
+
+    <!-- CUSTOMER DIRECT WHATSAPP MESSAGE SECTION -->
+    <section class="bg-slate-900 border-t border-slate-800 py-10 px-4 no-print">
+        <div class="max-w-2xl mx-auto bg-slate-950 border border-amber-500/30 rounded-2xl p-6 shadow-xl text-white">
+            <div class="text-center space-y-2 mb-6">
+                <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider font-english">
+                    <i class="fa-brands fa-whatsapp text-emerald-400" aria-hidden="true"></i> Direct Customer Support
+                </span>
+                <h3 class="text-xl sm:text-2xl font-black text-amber-400 font-english">Have Any Questions or Order Query?</h3>
+                <p class="text-xs text-gray-400">Send us a message directly on WhatsApp. Fill in your details below and hit send!</p>
+            </div>
+
+            <form onsubmit="sendWhatsAppDirectMessage(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="waCustName" class="block text-xs font-bold text-gray-300 mb-1">Your Name *</label>
+                        <input type="text" id="waCustName" required placeholder="Enter your full name" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:border-amber-400 outline-none">
+                    </div>
+                    <div>
+                        <label for="waCustPhone" class="block text-xs font-bold text-gray-300 mb-1">Your Phone Number *</label>
+                        <input type="tel" id="waCustPhone" required placeholder="017XXXXXXXX" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:border-amber-400 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label for="waCustMessage" class="block text-xs font-bold text-gray-300 mb-1">Your Message *</label>
+                    <textarea id="waCustMessage" required rows="3" placeholder="Write your query or message here..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:border-amber-400 outline-none"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg" aria-hidden="true"></i>
+                    <span>Send Message via WhatsApp</span>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 text-gray-400 border-t border-slate-800 mt-auto no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-xs text-gray-500 font-english">
+            © 2026 <span class="text-amber-400 font-bold">MENS ZONE FASHION</span>. All Rights Reserved.
+        </div>
+    </footer>
+
+    <!-- STRICT USERNAME & PASSWORD LOGIN MODAL (ADMIN / MANAGER / STAFF) -->
+    <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <button onclick="toggleAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-slate-900 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl mb-2 font-black">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="text-xl font-black text-slate-900">Admin Portal Login</h3>
+                <p class="text-xs text-gray-500">Enter your Firebase Username or Email</p>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">User Name / Email *</label>
+                    <input type="text" id="authUsername" required placeholder="e.g. admin or admin@menszone.com" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-amber-500 font-bold text-slate-800">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Password *</label>
+                    <input type="password" id="authPassword" required placeholder="Enter Password" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-amber-500">
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold py-2.5 rounded-xl text-xs shadow transition">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CART & CHECKOUT MODAL -->
+    <div id="cartModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex justify-end no-print">
+        <div class="bg-white w-full max-w-lg h-full shadow-2xl flex flex-col justify-between overflow-y-auto">
+            <div class="p-4 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-amber-400" aria-hidden="true"></i>
+                    <h3 class="text-base font-bold text-amber-400 font-english">Shopping Cart</h3>
+                </div>
+                <button onclick="toggleCartModal()" class="text-gray-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+
+            <div id="cartItemsContainer" class="p-4 space-y-4 flex-1 overflow-y-auto"></div>
+
+            <div class="p-4 border-t border-gray-200 bg-gray-50 space-y-3">
+                <div class="flex justify-between items-center font-bold text-slate-900">
+                    <span class="text-xs uppercase tracking-wider text-gray-500">Items Subtotal:</span>
+                    <span id="cartSubtotal" class="text-base font-extrabold text-slate-900">৳ 0</span>
+                </div>
+                
+                <form id="checkoutForm" onsubmit="submitOrder(event)" class="space-y-3 pt-2">
+                    <h4 class="text-xs font-extrabold text-slate-800 border-b pb-1 uppercase tracking-wider text-amber-600">Cash on Delivery Details:</h4>
+                    
+                    <div>
+                        <label for="custName" class="block text-xs font-bold text-gray-700 mb-1">Full Name *</label>
+                        <input type="text" id="custName" required placeholder="Enter customer full name" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                    
+                    <div>
+                        <label for="custPhone" class="block text-xs font-bold text-gray-700 mb-1">Phone Number * (11 Digits)</label>
+                        <input type="tel" id="custPhone" required placeholder="017XXXXXXXX" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 outline-none">
+                        <p id="phoneError" class="text-[10px] text-red-600 hidden mt-0.5">Please enter a valid 11-digit phone number (e.g., 01712345678)</p>
+                    </div>
+
+                    <div>
+                        <label for="custAddress" class="block text-xs font-bold text-gray-700 mb-1">Full Address *</label>
+                        <textarea id="custAddress" required rows="2" placeholder="District, Thana, House or Village name" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label for="custDelivery" class="block text-xs font-bold text-gray-700 mb-1">Delivery Location *</label>
+                        <select id="custDelivery" onchange="updateTotalWithDelivery()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                            <option value="80">Inside Dhaka (BDT 80)</option>
+                            <option value="150">Outside Dhaka (BDT 150)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-between items-center font-extrabold text-base text-slate-900 border-t pt-2">
+                        <span>Total Payable Amount:</span>
+                        <span id="cartGrandTotal" class="text-amber-600 text-xl font-black">৳ 0</span>
+                    </div>
+
+                    <button type="submit" id="submitOrderBtn" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black py-3 rounded-xl text-sm shadow-lg transition flex items-center justify-center gap-2">
+                        <span>Confirm Order</span> <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS ORDER MODAL -->
+    <div id="orderSuccessModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 text-center space-y-4">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-black shadow">
+                <i class="fa-solid fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-xl font-extrabold text-slate-900">Order Received Successfully!</h3>
+                <p class="text-xs text-gray-500">Thank you for shopping with MENS ZONE FASHION.</p>
+            </div>
+            <div class="bg-slate-50 border p-4 rounded-xl text-xs space-y-1 text-left">
+                <p class="text-gray-500">Order Tracking ID:</p>
+                <p id="successOrderId" class="text-lg font-black text-amber-600 font-english">#ORD-000000</p>
+                <p id="successCustName" class="font-bold text-slate-800">Customer: -</p>
+                <p id="successTotal" class="font-bold text-slate-800">Total Payable: BDT 0</p>
+            </div>
+            <button onclick="closeSuccessModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold py-2.5 rounded-xl text-xs shadow transition">
+                OK, Continue Shopping
+            </button>
+        </div>
+    </div>
+
+    <!-- ROLE-BASED CONTROL DASHBOARD MODAL (ADMIN, MANAGER, STAFF) -->
+    <div id="dashboardModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="bg-amber-500 text-slate-950 p-2 rounded-lg font-bold">
+                        <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 id="dashTitle" class="text-lg font-bold text-amber-400">Control Panel</h3>
+                        <p id="userRoleBadge" class="text-xs text-gray-400">Loading role permissions...</p>
+                    </div>
+                </div>
+                <button onclick="toggleDashboardModal()" class="text-gray-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-gray-200 bg-gray-100 px-6 pt-3 gap-2 overflow-x-auto">
+                <button id="tabAddBtn" onclick="switchAdminTab('add')" class="px-3.5 py-2 text-xs font-bold border-b-2 border-amber-500 text-amber-600 bg-white rounded-t-lg whitespace-nowrap">
+                    <i class="fa-solid fa-plus-circle mr-1" aria-hidden="true"></i> Add New Product
+                </button>
+                <button id="tabManageBtn" onclick="switchAdminTab('manage')" class="px-3.5 py-2 text-xs font-bold text-gray-600 border-b-2 border-transparent hover:text-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-boxes-stacked mr-1" aria-hidden="true"></i> Stock Products
+                </button>
+                <button id="tabOrdersBtn" onclick="switchAdminTab('orders')" class="px-3.5 py-2 text-xs font-bold text-gray-600 border-b-2 border-transparent hover:text-slate-900 whitespace-nowrap relative">
+                    <i class="fa-solid fa-list-check mr-1" aria-hidden="true"></i> Customer Orders
+                    <span id="orderBadge" class="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button id="tabReportBtn" onclick="switchAdminTab('report')" class="px-3.5 py-2 text-xs font-bold text-gray-600 border-b-2 border-transparent hover:text-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-line mr-1" aria-hidden="true"></i> Daily Sales Report
+                </button>
+                <button id="tabManualSellBtn" onclick="switchAdminTab('manual')" class="px-3.5 py-2 text-xs font-bold text-gray-600 border-b-2 border-transparent hover:text-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-hand-holding-dollar mr-1" aria-hidden="true"></i> Manual Sale (POS)
+                </button>
+                <button id="tabUsersBtn" onclick="switchAdminTab('users')" class="px-3.5 py-2 text-xs font-bold text-gray-600 border-b-2 border-transparent hover:text-slate-900 whitespace-nowrap hidden">
+                    <i class="fa-solid fa-users-gear mr-1" aria-hidden="true"></i> Create Staff / Manager
+                </button>
+                <button id="tabSettingsBtn" onclick="switchAdminTab('settings')" class="px-3.5 py-2 text-xs font-bold text-gray-600 border-b-2 border-transparent hover:text-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-key mr-1" aria-hidden="true"></i> Change Admin Password
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 bg-gray-50">
+                <!-- Tab 1: Upload Product -->
+                <div id="adminAddSection" class="space-y-4 max-w-2xl mx-auto bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h4 class="text-base font-bold text-slate-900 border-b pb-2">Save Product with Details & Image</h4>
+                    
+                    <form id="addProductForm" onsubmit="handleSaveProduct(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="prodCategory" class="block text-xs font-bold text-gray-700 mb-1">Select Category *</label>
+                                <select id="prodCategory" required onchange="handleCategoryChange()" class="w-full px-3 py-2 border rounded-lg text-sm bg-white font-bold focus:ring-2 focus:ring-amber-500 outline-none">
+                                    <option value="Panjabi">👑 Panjabi</option>
+                                    <option value="T-Shirt">👕 T-Shirt</option>
+                                    <option value="Polo Shirt">👔 Polo Shirt</option>
+                                    <option value="Shirt">👔 Shirt</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="prodBatch" class="block text-xs font-bold text-amber-700 mb-1">Batch Number (Batch / Code) *</label>
+                                <input type="text" id="prodBatch" required placeholder="e.g., BATCH-101" class="w-full px-3 py-2 border rounded-lg text-sm font-bold text-amber-800 bg-amber-50 focus:ring-2 focus:ring-amber-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="prodTitle" class="block text-xs font-bold text-gray-700 mb-1">Product Title / Name *</label>
+                            <input type="text" id="prodTitle" required placeholder="e.g., Exclusive Cotton Kabli Panjabi" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="prodPrice" class="block text-xs font-bold text-gray-700 mb-1">Selling Price (BDT ৳) *</label>
+                                <input type="number" id="prodPrice" required placeholder="1250" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                            </div>
+                            <div>
+                                <label for="prodOldPrice" class="block text-xs font-bold text-gray-700 mb-1">Old Price (Optional)</label>
+                                <input type="number" id="prodOldPrice" placeholder="1500" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <label class="block text-xs font-bold text-slate-800 mb-2">Select Sizes *</label>
+                            <div id="panjabiSizesBox" class="space-y-1">
+                                <p class="text-xs text-amber-700 font-bold mb-1">Panjabi Sizes (40, 42, 44, 46):</p>
+                                <div class="flex flex-wrap gap-4 text-sm">
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="40" class="w-4 h-4 text-amber-500 rounded" checked> 40</label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="42" class="w-4 h-4 text-amber-500 rounded" checked> 42</label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="44" class="w-4 h-4 text-amber-500 rounded" checked> 44</label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="46" class="w-4 h-4 text-amber-500 rounded" checked> 46</label>
+                                </div>
+                            </div>
+
+                            <div id="standardSizesBox" class="space-y-1 hidden">
+                                <p class="text-xs text-blue-700 font-bold mb-1">T-Shirt / Polo / Shirt Size:</p>
+                                <div class="flex flex-wrap gap-4 text-sm">
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="M" class="w-4 h-4 text-amber-500 rounded" checked> M</label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="L" class="w-4 h-4 text-amber-500 rounded" checked> L</label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="XL" class="w-4 h-4 text-amber-500 rounded" checked> XL</label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="XXL" class="w-4 h-4 text-amber-500 rounded"> XXL</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 border p-3 rounded-lg bg-gray-50">
+                            <label for="prodImageFile" class="block text-xs font-bold text-gray-800">Upload Product Image *</label>
+                            <input type="file" id="prodImageFile" accept="image/*" required onchange="previewSelectedImage(event)" class="text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 cursor-pointer w-full">
+                            <div id="imagePreviewBox" class="hidden mt-2 p-2 border rounded-lg bg-white text-center">
+                                <img id="previewImgTag" src="" alt="Preview" class="h-36 object-contain mx-auto rounded shadow">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="prodDesc" class="block text-xs font-bold text-gray-700 mb-1">Short Description</label>
+                            <textarea id="prodDesc" rows="2" placeholder="Fabric description..." class="w-full px-3 py-2 border rounded-lg text-sm outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold py-2.5 rounded-lg text-sm shadow">
+                            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload Product to Cloud
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tab 2: Stock Products -->
+                <div id="adminManageSection" class="hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-base font-bold text-slate-900">All Stock Products</h4>
+                        <span id="prodCountBadge" class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full">Total: 0 Items</span>
+                    </div>
+
+                    <div class="bg-white rounded-xl border overflow-x-auto shadow-sm">
+                        <table class="w-full text-left text-sm text-gray-600">
+                            <thead class="bg-slate-100 text-slate-800 uppercase text-xs font-bold">
+                                <tr>
+                                    <th class="p-3">Image</th>
+                                    <th class="p-3">Batch</th>
+                                    <th class="p-3">Title</th>
+                                    <th class="p-3">Category</th>
+                                    <th class="p-3">Price</th>
+                                    <th class="p-3">Sizes</th>
+                                    <th class="p-3 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminProductsTable" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Customer Orders -->
+                <div id="adminOrdersSection" class="hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-base font-bold text-slate-900">Customer Orders History</h4>
+                        <button onclick="clearAllOrders()" class="text-xs text-red-600 hover:underline"><i class="fa-solid fa-trash-can"></i> Clear Order History</button>
+                    </div>
+                    <div id="ordersListContainer" class="space-y-4"></div>
+                </div>
+
+                <!-- Tab 4: Daily Sales Report -->
+                <div id="adminReportSection" class="hidden space-y-4 max-w-4xl mx-auto bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-3">
+                        <div>
+                            <h4 class="text-base font-bold text-slate-900">📊 Daily Sales Report (দৈনিক বিক্রয় হিসাব)</h4>
+                            <p class="text-xs text-gray-500">Filter sales by delivery / transaction date</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label for="reportDateFilter" class="text-xs font-bold text-gray-700">Select Date:</label>
+                            <input type="date" id="reportDateFilter" onchange="renderSalesReport()" class="px-3 py-1.5 border rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-amber-500 outline-none">
+                            <button onclick="openReportPrintModal()" class="bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold text-xs px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow">
+                                <i class="fa-solid fa-print"></i> Print / PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                            <p class="text-xs font-bold text-amber-800">Total Revenue (Delivered + POS)</p>
+                            <p id="reportTotalRevenue" class="text-2xl font-black text-amber-600 font-english mt-1">৳ 0</p>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl">
+                            <p class="text-xs font-bold text-emerald-800">Delivered Sales Count</p>
+                            <p id="reportOrderCount" class="text-2xl font-black text-emerald-600 font-english mt-1">0</p>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                            <p class="text-xs font-bold text-slate-800">Total Items Sold</p>
+                            <p id="reportItemsCount" class="text-2xl font-black text-slate-900 font-english mt-1">0 Pcs</p>
+                        </div>
+                    </div>
+
+                    <!-- Sold Items Detailed List -->
+                    <div class="bg-white rounded-xl border overflow-x-auto shadow-sm">
+                        <table class="w-full text-left text-xs text-gray-600">
+                            <thead class="bg-slate-900 text-white uppercase text-[11px] font-bold">
+                                <tr>
+                                    <th class="p-3">Order / POS ID</th>
+                                    <th class="p-3">Type</th>
+                                    <th class="p-3">Product Name & Batch</th>
+                                    <th class="p-3 text-center">Size & Qty</th>
+                                    <th class="p-3 text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesReportTable" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 5: POS Sale Entry -->
+                <div id="adminManualSellSection" class="hidden space-y-4 max-w-2xl mx-auto bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="border-b pb-2 flex justify-between items-center">
+                        <h4 class="text-base font-bold text-slate-900">Direct / Manual Sale Entry (POS)</h4>
+                        <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full">Delivery Fee BDT 0</span>
+                    </div>
+
+                    <form id="manualSellForm" onsubmit="handleManualSell(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="manualCategory" class="block text-xs font-bold text-gray-700 mb-1">1. Select Category *</label>
+                                <select id="manualCategory" onchange="handleManualCategoryChange()" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white font-bold outline-none">
+                                    <option value="">-- Select Category --</option>
+                                    <option value="Panjabi">👑 Panjabi</option>
+                                    <option value="T-Shirt">👕 T-Shirt</option>
+                                    <option value="Polo Shirt">👔 Polo Shirt</option>
+                                    <option value="Shirt">👔 Shirt</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="manualSelectBatch" class="block text-xs font-bold text-amber-700 mb-1">2. Select Batch No / Product *</label>
+                                <select id="manualSelectBatch" onchange="handleManualBatchChange()" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white font-bold text-amber-800 outline-none">
+                                    <option value="">-- Select Category First --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="manualSelectSize" class="block text-xs font-bold text-gray-700 mb-1">Select Size *</label>
+                                <select id="manualSelectSize" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white font-bold outline-none">
+                                    <option value="">-- Size --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="manualQty" class="block text-xs font-bold text-gray-700 mb-1">Quantity *</label>
+                                <input type="number" id="manualQty" min="1" value="1" required class="w-full px-3 py-2 border rounded-lg text-sm font-bold outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="manualPrice" class="block text-xs font-bold text-emerald-700 mb-1">Selling Price (BDT ৳) *</label>
+                                <input type="number" id="manualPrice" required placeholder="Price auto-fills" class="w-full px-3 py-2 border rounded-lg text-sm font-bold text-emerald-800 bg-emerald-50 outline-none">
+                            </div>
+                            <div>
+                                <label for="manualCustName" class="block text-xs font-bold text-gray-700 mb-1">Customer Name (Optional)</label>
+                                <input type="text" id="manualCustName" placeholder="Counter Sale" class="w-full px-3 py-2 border rounded-lg text-sm outline-none">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm shadow">
+                            <i class="fa-solid fa-file-circle-check mr-1"></i> Confirm Manual Sale
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tab 6: Create Staff / Manager Account -->
+                <div id="adminUsersSection" class="hidden space-y-4 max-w-xl mx-auto bg-white p-6 rounded-xl border border-amber-300 shadow-sm">
+                    <div class="border-b pb-2 flex justify-between items-center">
+                        <h4 class="text-base font-bold text-slate-900">Create Staff or Manager Credentials</h4>
+                        <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">Admin Exclusive</span>
+                    </div>
+
+                    <form onsubmit="handleCreateUserAccount(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Full Name *</label>
+                            <input type="text" id="newUserName" required placeholder="Rahim Ahmed" class="w-full px-3 py-2 border rounded-lg text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">User Name / Email *</label>
+                            <input type="text" id="newUserEmail" required placeholder="staff1" class="w-full px-3 py-2 border rounded-lg text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Set Password *</label>
+                            <input type="password" id="newUserPass" required placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Assign Permission Role *</label>
+                            <select id="newUserRole" required class="w-full px-3 py-2 border rounded-lg text-xs bg-white font-bold outline-none">
+                                <option value="manager">Manager (Product Upload & Order Processing)</option>
+                                <option value="staff">Staff (POS Sale & Delivery Status Update)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold py-2.5 rounded-lg text-xs shadow">
+                            <i class="fa-solid fa-user-plus mr-1"></i> Create Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tab 7: Change Admin Password -->
+                <div id="adminSettingsSection" class="hidden space-y-4 max-w-md mx-auto bg-white p-6 rounded-xl border border-slate-300 shadow-sm">
+                    <div class="border-b pb-2 flex justify-between items-center">
+                        <h4 class="text-base font-bold text-slate-900"><i class="fa-solid fa-shield-halved text-amber-500 mr-1"></i> Change Admin Password</h4>
+                    </div>
+
+                    <form onsubmit="handleChangeAdminCredentials(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">New Admin Password *</label>
+                            <input type="password" id="changeAdminPass" required placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Confirm New Password *</label>
+                            <input type="password" id="changeAdminPassConfirm" required placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg text-xs outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2.5 rounded-lg text-xs shadow transition">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Update Password via Firebase
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINTABLE DAILY SALES REPORT MODAL -->
+    <div id="printableReportModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 sm:p-8 font-english text-slate-900 space-y-6 relative border">
+            <div class="flex justify-between items-center border-b pb-4 no-print">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-600"><i class="fa-solid fa-chart-line mr-1"></i> Daily Sales Report Preview</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold text-xs px-4 py-2 rounded-lg transition flex items-center gap-2 shadow">
+                        <i class="fa-solid fa-print"></i> Print Report / Save PDF
+                    </button>
+                    <button onclick="closeReportPrintModal()" class="text-gray-400 hover:text-red-600 text-2xl px-2"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-start border-b border-gray-200 pb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">MENS ZONE FASHION</h2>
+                    <p class="text-xs text-gray-500 mt-1">Daily Sales Summary & Itemized Report</p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-block bg-slate-900 text-amber-400 text-xs font-extrabold px-3 py-1 rounded tracking-wider uppercase">SALES REPORT</span>
+                    <p class="text-xs font-bold text-gray-600 mt-2" id="printReportDate">Date: 2026-01-01</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 text-xs bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-500 uppercase">Total Revenue</p>
+                    <p class="text-lg font-black text-amber-600 font-english" id="printReportRev">BDT 0</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-500 uppercase">Delivered Orders</p>
+                    <p class="text-lg font-black text-emerald-600 font-english" id="printReportOrders">0</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-gray-500 uppercase">Items Sold</p>
+                    <p class="text-lg font-black text-slate-900 font-english" id="printReportItems">0 Pcs</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-white uppercase text-[11px] font-bold">
+                            <th class="p-2.5 rounded-l">ID</th>
+                            <th class="p-2.5">Type</th>
+                            <th class="p-2.5">Product Name & Batch</th>
+                            <th class="p-2.5 text-center">Size & Qty</th>
+                            <th class="p-2.5 text-right rounded-r">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="printReportTableBody" class="divide-y divide-gray-200 text-slate-800"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINTABLE ENGLISH CASH MEMO MODAL -->
+    <div id="printableInvoiceModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 sm:p-8 font-english text-slate-900 space-y-6 relative border">
+            <div class="flex justify-between items-center border-b pb-4 no-print">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-600"><i class="fa-solid fa-receipt mr-1"></i> English Cash Memo Preview</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="triggerInvoicePrint()" class="bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold text-xs px-4 py-2 rounded-lg transition flex items-center gap-2 shadow">
+                        <i class="fa-solid fa-print"></i> Print Memo / Save PDF
+                    </button>
+                    <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-red-600 text-2xl px-2"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-start border-b border-gray-200 pb-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">MENS ZONE FASHION</h2>
+                    <p class="text-xs text-gray-500 mt-1">Premium Panjabi, Shirt, Polo & T-Shirt Collection</p>
+                    <p class="text-xs text-gray-500">Dhaka, Bangladesh | Cash On Delivery Service</p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-block bg-slate-900 text-amber-400 text-xs font-extrabold px-3 py-1 rounded tracking-wider uppercase">CASH MEMO</span>
+                    <p class="text-xs font-bold text-gray-600 mt-2" id="invOrderId">INVOICE: #ORD-0000</p>
+                    <p class="text-xs text-gray-500" id="invDate">Date: 01/01/2026</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-xs bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <div>
+                    <p class="font-bold text-gray-500 uppercase tracking-wider text-[10px] mb-1">Customer Details:</p>
+                    <p class="font-bold text-slate-900 text-sm" id="invCustName">Mr. Customer</p>
+                    <p class="font-medium text-gray-700" id="invCustPhone">Phone: 01700000000</p>
+                    <p class="text-gray-600 mt-1" id="invCustAddress">Address: Dhaka, Bangladesh</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-gray-500 uppercase tracking-wider text-[10px] mb-1">Payment Status:</p>
+                    <p class="font-extrabold text-amber-600 text-sm" id="invPaymentStatus">Cash On Delivery (COD)</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-white uppercase text-[11px] font-bold">
+                            <th class="p-2.5 rounded-l">#</th>
+                            <th class="p-2.5">Item Description</th>
+                            <th class="p-2.5 text-center">Batch</th>
+                            <th class="p-2.5 text-center">Size</th>
+                            <th class="p-2.5 text-center">Qty</th>
+                            <th class="p-2.5 text-right">Unit Price</th>
+                            <th class="p-2.5 text-right rounded-r">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invItemsTable" class="divide-y divide-gray-200 text-slate-800"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <div class="w-64 space-y-2 text-xs">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Items Subtotal:</span>
+                        <span class="font-bold" id="invSubtotal">BDT 0</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Delivery Fee:</span>
+                        <span class="font-bold" id="invDeliveryFee">BDT 80</span>
+                    </div>
+                    <div class="flex justify-between text-slate-900 font-extrabold text-base border-t border-b border-slate-900 py-2">
+                        <span>Grand Total:</span>
+                        <span class="text-amber-600" id="invGrandTotal">BDT 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ENGINE & FIREBASE REALTIME DATABASE LOGIC -->
+    <script>
+        // FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyDp0-kPnQzjvuL0d6WJ6qkFyvKlemR5vxw",
+            authDomain: "menszonefashion-34adc.firebaseapp.com",
+            projectId: "menszonefashion-34adc",
+            storageBucket: "menszonefashion-34adc.firebasestorage.app",
+            messagingSenderId: "856328552216",
+            appId: "1:856328552216:web:d933ee41052a9af038286d",
+            measurementId: "G-7TWY90N7H5",
+            databaseURL: "https://menszonefashion-34adc-default-rtdb.firebaseio.com"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        const ADMIN_WHATSAPP_NUMBER = "8801759333003";
+        let currentUser = null;
+        let currentUserRole = 'customer';
+        let products = [];
+        let cart = [];
+        let orders = [];
+        let activeCategory = 'Panjabi'; 
+        let activeSortOption = 'default';
+        let currentUploadedImageData = '';
+        const selectedSizesMap = {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            listenToAuthChanges();
+            loadProductsFromCloud();
+            loadOrdersFromCloud();
+            
+            const todayIso = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('reportDateFilter');
+            if (dateInput) dateInput.value = todayIso;
+        });
+
+        // AUTH & ROLE OBSERVER (PURE FIREBASE AUTHENTICATION ONLY)
+        function listenToAuthChanges() {
+            auth.onAuthStateChanged(user => {
+                const statusBox = document.getElementById('authStatusBox');
+                const dashBtn = document.getElementById('dashboardBtn');
+                const usersTabBtn = document.getElementById('tabUsersBtn');
+
+                if (user) {
+                    currentUser = user;
+                    db.ref('users/' + user.uid).once('value').then(snapshot => {
+                        const userData = snapshot.val();
+                        currentUserRole = userData ? userData.role : 'admin'; // Defaults to admin if root account
+
+                        if (['admin', 'manager', 'staff'].includes(currentUserRole)) {
+                            document.getElementById('roleLabel').innerText = currentUserRole;
+                            document.getElementById('userRoleBadge').innerText = `Role: ${currentUserRole.toUpperCase()} (${user.email})`;
+                            dashBtn.classList.remove('hidden');
+
+                            statusBox.innerHTML = `
+                                <button onclick="handleLogout()" class="bg-red-900/80 hover:bg-red-800 text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                                </button>
+                            `;
+                        } else {
+                            alert("Access Denied! Only authorized accounts are allowed.");
+                            auth.signOut();
+                        }
+
+                        if (currentUserRole === 'admin') {
+                            if (usersTabBtn) usersTabBtn.classList.remove('hidden');
+                        } else {
+                            if (usersTabBtn) usersTabBtn.classList.add('hidden');
+                        }
+
+                        applyRoleTabPermissions();
+                    });
+                } else {
+                    currentUser = null;
+                    currentUserRole = 'customer';
+                    dashBtn.classList.add('hidden');
+                    statusBox.innerHTML = `
+                        <button onclick="toggleAuthModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition shadow">
+                            <i class="fa-solid fa-user-lock"></i>
+                            <span>ADMIN</span>
+                        </button>
+                    `;
+                }
+            });
+        }
+
+        function applyRoleTabPermissions() {
+            const addBtn = document.getElementById('tabAddBtn');
+            const manageBtn = document.getElementById('tabManageBtn');
+            const reportBtn = document.getElementById('tabReportBtn');
+            const manualBtn = document.getElementById('tabManualSellBtn');
+            const settingsBtn = document.getElementById('tabSettingsBtn');
+
+            if (currentUserRole === 'staff') {
+                addBtn.classList.add('hidden');
+                manageBtn.classList.add('hidden');
+                reportBtn.classList.add('hidden');
+                manualBtn.classList.remove('hidden');
+                if (settingsBtn) settingsBtn.classList.add('hidden');
+                switchAdminTab('orders');
+            } else if (currentUserRole === 'manager') {
+                addBtn.classList.remove('hidden');
+                manageBtn.classList.remove('hidden');
+                reportBtn.classList.remove('hidden');
+                manualBtn.classList.add('hidden');
+                if (settingsBtn) settingsBtn.classList.add('hidden');
+                switchAdminTab('add');
+            } else if (currentUserRole === 'admin') {
+                addBtn.classList.remove('hidden');
+                manageBtn.classList.remove('hidden');
+                reportBtn.classList.remove('hidden');
+                manualBtn.classList.remove('hidden');
+                if (settingsBtn) settingsBtn.classList.remove('hidden');
+                switchAdminTab('add');
+            }
+        }
+
+        function toggleAuthModal() {
+            document.getElementById('authModal').classList.toggle('hidden');
+        }
+
+        // PURE FIREBASE AUTHENTICATION LOGIN
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            let usernameInput = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!usernameInput.includes('@')) {
+                usernameInput = usernameInput.toLowerCase() + '@menszone.com';
+            }
+
+            auth.signInWithEmailAndPassword(usernameInput, password)
+                .then(() => {
+                    toggleAuthModal();
+                    alert("Login Successful!");
+                })
+                .catch(err => {
+                    alert("Invalid Username/Email or Password!\n(" + err.message + ")");
+                });
+        }
+
+        // CHANGE PASSWORD DIRECTLY IN FIREBASE AUTHENTICATION
+        function handleChangeAdminCredentials(e) {
+            e.preventDefault();
+            if (currentUserRole !== 'admin') return alert("Only Admin can change credentials!");
+
+            const newPass = document.getElementById('changeAdminPass').value.trim();
+            const confirmPass = document.getElementById('changeAdminPassConfirm').value.trim();
+
+            if (!newPass) return alert("Please enter a new password!");
+            if (newPass !== confirmPass) return alert("Passwords do not match!");
+
+            if (auth.currentUser) {
+                auth.currentUser.updatePassword(newPass).then(() => {
+                    alert("Admin password updated successfully in Firebase!");
+                    e.target.reset();
+                }).catch(err => {
+                    alert("Error updating password: " + err.message + "\n(Please re-login and try again)");
+                });
+            } else {
+                alert("No active Firebase session found. Please login again.");
+            }
+        }
+
+        function handleLogout() {
+            auth.signOut().then(() => alert("Logged out successfully!"));
+        }
+
+        function handleCreateUserAccount(e) {
+            e.preventDefault();
+            if (currentUserRole !== 'admin') return alert("Only Admin can create Staff/Manager!");
+
+            const name = document.getElementById('newUserName').value.trim();
+            let usernameInput = document.getElementById('newUserEmail').value.trim();
+            const password = document.getElementById('newUserPass').value.trim();
+            const role = document.getElementById('newUserRole').value;
+
+            if (!usernameInput.includes('@')) {
+                usernameInput = usernameInput.toLowerCase() + '@menszone.com';
+            }
+
+            const secondaryApp = firebase.initializeApp(firebaseConfig, "SecondaryAppInstance");
+            secondaryApp.auth().createUserWithEmailAndPassword(usernameInput, password).then(cred => {
+                return db.ref('users/' + cred.user.uid).set({
+                    name: name,
+                    email: usernameInput,
+                    role: role,
+                    createdBy: currentUser.email
+                });
+            }).then(() => {
+                alert(`Account created successfully for ${role.toUpperCase()} (${usernameInput.split('@')[0]})!`);
+                secondaryApp.delete();
+                e.target.reset();
+            }).catch(err => alert(err.message));
+        }
+
+        function loadProductsFromCloud() {
+            db.ref('products').on('value', snapshot => {
+                const data = snapshot.val();
+                products = data ? Object.values(data) : [];
+                renderProducts();
+            });
+        }
+
+        function renderProducts(searchQuery = '') {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            const desktopVal = document.getElementById('searchInput')?.value.trim() || '';
+            const mobileVal = document.getElementById('searchInputMobile')?.value.trim() || '';
+            const currentQuery = (searchQuery || desktopVal || mobileVal).toLowerCase().trim();
+
+            let filtered = products;
+
+            if (currentQuery !== '') {
+                filtered = filtered.filter(p => 
+                    p.title.toLowerCase().includes(currentQuery) || 
+                    p.batch.toLowerCase().includes(currentQuery) ||
+                    p.category.toLowerCase().includes(currentQuery)
+                );
+            } else {
+                filtered = filtered.filter(p => p.category === activeCategory);
+            }
+
+            if (activeSortOption === 'lowToHigh') filtered.sort((a, b) => a.price - b.price);
+            else if (activeSortOption === 'highToLow') filtered.sort((a, b) => b.price - a.price);
+
+            document.getElementById('displayedCount').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-16 text-gray-500 font-bold">No products available in this category!</div>`;
+                return;
+            }
+
+            filtered.forEach(prod => {
+                const isPanjabi = prod.category === 'Panjabi';
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-xl transition flex flex-col justify-between group";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="relative w-full aspect-[3/4] overflow-hidden bg-slate-100">
+                            <img src="${prod.image}" alt="${prod.title}" class="w-full h-full object-cover">
+                            <span class="absolute top-2.5 right-2.5 text-[10px] font-extrabold bg-amber-500 text-slate-950 px-2.5 py-1 rounded shadow">BATCH: ${prod.batch}</span>
+                        </div>
+                        <div class="p-4 space-y-2.5">
+                            <h4 class="font-bold text-slate-900 text-base line-clamp-1">${prod.title}</h4>
+                            <p class="text-xs text-gray-500 line-clamp-2">${prod.desc || '100% Premium Fabric'}</p>
+                            <div class="pt-1">
+                                <label class="text-[11px] font-bold text-gray-700 block mb-1">${isPanjabi ? 'Panjabi Size:' : 'Select Size:'}</label>
+                                <div class="flex flex-wrap gap-1.5" id="sizes-group-${prod.id}">
+                                    ${prod.sizes.map((sz, idx) => `
+                                        <button type="button" onclick="selectCardSize('${prod.id}', '${sz}')" class="size-btn-${prod.id} text-xs font-bold border px-2.5 py-1 rounded-lg transition ${idx === 0 ? 'bg-slate-900 text-amber-400 border-slate-900' : 'bg-gray-50 text-gray-700 border-gray-300'}" data-size="${sz}">${sz}</button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t flex items-center justify-between bg-slate-50/50 mt-2">
+                        <div class="text-lg font-black text-amber-600 font-english">৳ ${prod.price}</div>
+                        <button onclick="addToCart('${prod.id}')" class="bg-slate-900 text-amber-400 font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-amber-500 hover:text-slate-950 transition">Order Now</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function selectCardSize(prodId, sizeVal) {
+            selectedSizesMap[prodId] = sizeVal;
+            document.querySelectorAll(`.size-btn-${prodId}`).forEach(btn => {
+                btn.className = btn.getAttribute('data-size') === sizeVal ? 
+                    `size-btn-${prodId} text-xs font-bold border px-2.5 py-1 rounded-lg bg-slate-900 text-amber-400 border-slate-900` : 
+                    `size-btn-${prodId} text-xs font-bold border px-2.5 py-1 rounded-lg bg-gray-50 text-gray-700 border-gray-300`;
+            });
+        }
+
+        function toggleDashboardModal() {
+            const modal = document.getElementById('dashboardModal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                renderAdminProducts();
+                renderAdminOrders();
+                renderSalesReport();
+            }
+        }
+
+        function switchAdminTab(tab) {
+            const addSec = document.getElementById('adminAddSection');
+            const manageSec = document.getElementById('adminManageSection');
+            const ordersSec = document.getElementById('adminOrdersSection');
+            const reportSec = document.getElementById('adminReportSection');
+            const manualSec = document.getElementById('adminManualSellSection');
+            const usersSec = document.getElementById('adminUsersSection');
+            const settingsSec = document.getElementById('adminSettingsSection');
+
+            [addSec, manageSec, ordersSec, reportSec, manualSec, usersSec, settingsSec].forEach(s => { if(s) s.classList.add('hidden'); });
+
+            if (tab === 'add') addSec.classList.remove('hidden');
+            else if (tab === 'manage') { manageSec.classList.remove('hidden'); renderAdminProducts(); }
+            else if (tab === 'orders') { ordersSec.classList.remove('hidden'); renderAdminOrders(); }
+            else if (tab === 'report') { reportSec.classList.remove('hidden'); renderSalesReport(); }
+            else if (tab === 'manual') manualSec.classList.remove('hidden');
+            else if (tab === 'users') usersSec.classList.remove('hidden');
+            else if (tab === 'settings' && settingsSec) settingsSec.classList.remove('hidden');
+        }
+
+        function handleCategoryChange() {
+            const cat = document.getElementById('prodCategory').value;
+            document.getElementById('panjabiSizesBox').classList.toggle('hidden', cat !== 'Panjabi');
+            document.getElementById('standardSizesBox').classList.toggle('hidden', cat === 'Panjabi');
+        }
+
+        function previewSelectedImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentUploadedImageData = e.target.result;
+                    document.getElementById('previewImgTag').src = currentUploadedImageData;
+                    document.getElementById('imagePreviewBox').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleSaveProduct(e) {
+            e.preventDefault();
+            if (!['admin', 'manager'].includes(currentUserRole)) return alert("Permission Denied!");
+            if (!currentUploadedImageData) return alert('Upload a product image!');
+
+            const category = document.getElementById('prodCategory').value;
+            const batch = document.getElementById('prodBatch').value.trim();
+            const title = document.getElementById('prodTitle').value.trim();
+            const price = parseInt(document.getElementById('prodPrice').value);
+            const oldPrice = document.getElementById('prodOldPrice').value ? parseInt(document.getElementById('prodOldPrice').value) : null;
+            const desc = document.getElementById('prodDesc').value.trim();
+
+            const checkedBoxes = document.querySelectorAll('input[name="sizes"]:checked');
+            const selectedSizes = Array.from(checkedBoxes).map(cb => cb.value);
+
+            const newId = 'prod-' + Date.now();
+            const newProd = { id: newId, batch, title, category, price, oldPrice, sizes: selectedSizes, image: currentUploadedImageData, desc };
+
+            db.ref('products/' + newId).set(newProd).then(() => {
+                alert('Product saved to Cloud!');
+                document.getElementById('addProductForm').reset();
+                document.getElementById('imagePreviewBox').classList.add('hidden');
+                currentUploadedImageData = '';
+            });
+        }
+
+        function renderAdminProducts() {
+            const tbody = document.getElementById('adminProductsTable');
+            tbody.innerHTML = '';
+            document.getElementById('prodCountBadge').innerText = `Total: ${products.length} Items`;
+
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3"><img src="${p.image}" class="w-12 h-12 object-cover rounded border"></td>
+                    <td class="p-3 font-bold text-amber-700 font-english">${p.batch}</td>
+                    <td class="p-3 font-bold text-slate-800">${p.title}</td>
+                    <td class="p-3"><span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded font-english">${p.category}</span></td>
+                    <td class="p-3 font-bold text-slate-900 font-english">৳ ${p.price}</td>
+                    <td class="p-3 text-xs font-english">${p.sizes.join(', ')}</td>
+                    <td class="p-3 text-center">
+                        ${currentUserRole === 'admin' ? `
+                            <button onclick="deleteProduct('${p.id}')" class="bg-red-100 hover:bg-red-200 text-red-700 px-2.5 py-1 rounded text-xs font-bold">Delete</button>
+                        ` : '<span class="text-gray-400">View Only</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteProduct(id) {
+            if (currentUserRole !== 'admin') return alert("Only Admin can delete!");
+            if (confirm('Delete this product?')) db.ref('products/' + id).remove();
+        }
+
+        function addToCart(prodId) {
+            const product = products.find(p => p.id === prodId);
+            if (!product) return;
+            const selectedSize = selectedSizesMap[prodId] || product.sizes[0];
+
+            const existingIndex = cart.findIndex(c => c.id === prodId && c.selectedSize === selectedSize);
+            if (existingIndex > -1) cart[existingIndex].qty += 1;
+            else cart.push({ id: product.id, title: product.title, batch: product.batch, price: product.price, image: product.image, category: product.category, selectedSize: selectedSize, qty: 1 });
+
+            updateCartBadge();
+            renderCartItems();
+            toggleCartModal(true);
+        }
+
+        function changeCartQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function removeCartItem(index) {
+            cart.splice(index, 1);
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function updateCartBadge() {
+            document.getElementById('cartCount').innerText = cart.reduce((sum, i) => sum + i.qty, 0);
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItemsContainer');
+            container.innerHTML = '';
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-400"><p class="font-bold text-slate-800">Cart is empty!</p></div>`;
+                document.getElementById('cartSubtotal').innerText = `৳ 0`;
+                document.getElementById('cartGrandTotal').innerText = `৳ 0`;
+                return;
+            }
+
+            let subtotal = 0;
+            cart.forEach((item, idx) => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-3 p-3 bg-slate-50 border rounded-xl";
+                row.innerHTML = `
+                    <img src="${item.image}" class="w-14 h-14 object-cover rounded-lg border">
+                    <div class="flex-1">
+                        <h5 class="font-bold text-xs text-slate-900 line-clamp-1">${item.title}</h5>
+                        <p class="text-[11px] text-gray-500">Batch: <strong class="text-amber-700">${item.batch}</strong> | Size: <span class="bg-amber-100 font-bold px-1.5 py-0.5 rounded">${item.selectedSize}</span></p>
+                        <p class="text-xs font-bold text-slate-800 mt-1">৳ ${item.price} × ${item.qty} = <span class="text-amber-600 font-extrabold">৳ ${itemTotal}</span></p>
+                    </div>
+                    <div class="flex items-center gap-1 bg-white border rounded-lg p-1">
+                        <button onclick="changeCartQty(${idx}, -1)" class="w-6 h-6 rounded bg-gray-100 text-xs font-bold">-</button>
+                        <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
+                        <button onclick="changeCartQty(${idx}, 1)" class="w-6 h-6 rounded bg-gray-100 text-xs font-bold">+</button>
+                    </div>
+                    <button onclick="removeCartItem(${idx})" class="text-gray-400 hover:text-red-600 text-sm p-1"><i class="fa-solid fa-trash-can"></i></button>
+                `;
+                container.appendChild(row);
+            });
+
+            document.getElementById('cartSubtotal').innerText = `৳ ${subtotal}`;
+            updateTotalWithDelivery();
+        }
+
+        function updateTotalWithDelivery() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const deliveryFee = parseInt(document.getElementById('custDelivery').value || 80);
+            document.getElementById('cartGrandTotal').innerText = `৳ ${subtotal > 0 ? subtotal + deliveryFee : 0}`;
+        }
+
+        function toggleCartModal(forceOpen = false) {
+            const modal = document.getElementById('cartModal');
+            if (forceOpen) modal.classList.remove('hidden');
+            else modal.classList.toggle('hidden');
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            if (cart.length === 0) return alert('Cart is empty!');
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const deliveryFee = parseInt(document.getElementById('custDelivery').value);
+
+            if (!/^01[3-9]\d{8}$/.test(phone)) {
+                document.getElementById('phoneError').classList.remove('hidden');
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const total = subtotal + deliveryFee;
+            const newOrderId = 'ORD-' + Date.now().toString().slice(-6);
+
+            const newOrder = {
+                orderId: newOrderId,
+                date: new Date().toLocaleDateString('en-GB'),
+                deliveredDate: null,
+                customer: { name, phone, address },
+                items: [...cart],
+                deliveryFee,
+                subtotal,
+                total,
+                isManual: false,
+                isDelivered: false,
+                status: 'Pending'
+            };
+
+            db.ref('orders/' + newOrderId).set(newOrder).then(() => {
+                document.getElementById('successOrderId').innerText = `#${newOrderId}`;
+                document.getElementById('successCustName').innerText = `Customer: ${name} (${phone})`;
+                document.getElementById('successTotal').innerText = `Total Payable: BDT ${total}`;
+                
+                cart = [];
+                updateCartBadge();
+                renderCartItems();
+                document.getElementById('checkoutForm').reset();
+                toggleCartModal();
+                document.getElementById('orderSuccessModal').classList.remove('hidden');
+            });
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('orderSuccessModal').classList.add('hidden');
+        }
+
+        function loadOrdersFromCloud() {
+            db.ref('orders').on('value', snapshot => {
+                const data = snapshot.val();
+                orders = data ? Object.values(data) : [];
+                updateOrderBadge();
+                renderSalesReport();
+            });
+        }
+
+        function handleManualCategoryChange() {
+            const cat = document.getElementById('manualCategory').value;
+            const batchSelect = document.getElementById('manualSelectBatch');
+            batchSelect.innerHTML = '<option value="">-- Select Batch Number --</option>';
+            if (!cat) return;
+
+            products.filter(p => p.category === cat).forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `[Batch: ${p.batch}] ${p.title} - ৳${p.price}`;
+                batchSelect.appendChild(opt);
+            });
+        }
+
+        function handleManualBatchChange() {
+            const prodId = document.getElementById('manualSelectBatch').value;
+            const sizeSelect = document.getElementById('manualSelectSize');
+            const priceInput = document.getElementById('manualPrice');
+            sizeSelect.innerHTML = '<option value="">-- Size --</option>';
+
+            const product = products.find(p => p.id === prodId);
+            if (product) {
+                priceInput.value = product.price;
+                product.sizes.forEach(sz => {
+                    const opt = document.createElement('option');
+                    opt.value = sz;
+                    opt.textContent = sz;
+                    sizeSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function handleManualSell(e) {
+            e.preventDefault();
+            const prodId = document.getElementById('manualSelectBatch').value;
+            const size = document.getElementById('manualSelectSize').value;
+            const qty = parseInt(document.getElementById('manualQty').value);
+            const price = parseInt(document.getElementById('manualPrice').value);
+            const custName = document.getElementById('manualCustName').value || 'Walk-in Customer';
+
+            const product = products.find(p => p.id === prodId);
+            if (!product) return alert('Select product batch!');
+
+            const total = price * qty;
+            const posId = 'POS-' + Date.now().toString().slice(-6);
+            const todayIso = new Date().toISOString().split('T')[0];
+
+            const manualOrder = {
+                orderId: posId,
+                date: new Date().toLocaleDateString('en-GB'),
+                deliveredDate: todayIso,
+                customer: { name: custName, phone: 'N/A', address: 'Direct Store Sale' },
+                items: [{ id: product.id, title: product.title, batch: product.batch, price: price, image: product.image, category: product.category, selectedSize: size, qty: qty }],
+                deliveryFee: 0,
+                subtotal: total,
+                total: total,
+                isManual: true,
+                isDelivered: true,
+                status: 'Completed'
+            };
+
+            db.ref('orders/' + posId).set(manualOrder).then(() => {
+                alert('POS Sale Saved!');
+                document.getElementById('manualSellForm').reset();
+                switchAdminTab('report');
+            });
+        }
+
+        function toggleDeliveryStatus(orderId, currentStatus) {
+            const todayIso = new Date().toISOString().split('T')[0];
+            const updates = {
+                isDelivered: !currentStatus,
+                status: !currentStatus ? 'Delivered' : 'Pending',
+                deliveredDate: !currentStatus ? todayIso : null
+            };
+
+            db.ref('orders/' + orderId).update(updates);
+        }
+
+        function renderAdminOrders() {
+            const container = document.getElementById('ordersListContainer');
+            container.innerHTML = '';
+            if (orders.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-gray-400"><p>No orders yet!</p></div>`;
+                return;
+            }
+
+            orders.forEach(ord => {
+                const card = document.createElement('div');
+                card.className = `bg-white border rounded-xl p-4 shadow-sm space-y-3 ${ord.isDelivered ? 'border-emerald-500/50 bg-emerald-50/20' : ''}`;
+
+                let cleanPhone = ord.customer.phone ? ord.customer.phone.replace(/[^0-9]/g, '') : '';
+                if (cleanPhone.startsWith('0')) cleanPhone = '88' + cleanPhone;
+
+                const customBanglaMsg = `আসসালামু আলাইকুম। 😊\nআপনার অর্ডারটি আমরা পেয়েছি। অনুগ্রহ করে অর্ডারটি কনফার্ম করুন। অর্ডার কনফার্ম করার পর আগামী ৩–৫ দিনের মধ্যে আপনার পণ্যটি পৌঁছে দেওয়া হবে, ইনশাআল্লাহ। ❤️\nআমাদের সাথে থাকার জন্য ধন্যবাদ। 🛍️`;
+                const waMessage = encodeURIComponent(customBanglaMsg);
+                const waLink = `https://wa.me/${cleanPhone}?text=${waMessage}`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <span class="font-extrabold text-slate-900 font-english">${ord.orderId}</span>
+                            ${ord.isManual ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded ml-2">Direct Sale</span>' : ''}
+                            <span class="text-xs text-gray-500 ml-2 font-english">🕒 Order Date: ${ord.date}</span>
+                            ${ord.deliveredDate ? `<span class="text-xs text-emerald-700 ml-2 font-bold font-english">✔ Delivered: ${ord.deliveredDate}</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full ${ord.isDelivered ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${ord.isDelivered ? '✔ Delivered' : '⏳ Pending'}
+                            </span>
+                            ${currentUserRole === 'admin' ? `
+                                <button onclick="deleteSingleOrder('${ord.orderId}')" class="text-xs text-red-500 p-1"><i class="fa-solid fa-trash"></i></button>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="bg-gray-50 p-3 rounded-lg border space-y-1">
+                            <p class="font-bold border-b pb-1">👤 Customer:</p>
+                            <p><strong>Name:</strong> ${ord.customer.name}</p>
+                            <p><strong>Phone:</strong> ${ord.customer.phone}</p>
+                            <p><strong>Address:</strong> ${ord.customer.address}</p>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg border space-y-1">
+                            <p class="font-bold border-b pb-1">📦 Items:</p>
+                            <ul class="list-disc list-inside">
+                                ${ord.items.map(i => `<li>${i.title} (Batch: <strong class="text-amber-700">${i.batch}</strong>, Size: ${i.selectedSize}) - ${i.qty} Pcs</li>`).join('')}
+                            </ul>
+                            <p class="font-extrabold text-amber-600 border-t pt-1">Total: BDT ${ord.total}</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex justify-between items-center border-t">
+                        <button onclick="toggleDeliveryStatus('${ord.orderId}', ${ord.isDelivered})" class="${ord.isDelivered ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700'} font-bold text-xs px-3.5 py-2 rounded-lg">
+                            ${ord.isDelivered ? '✔ Delivered (Tick Marked)' : 'Mark as Delivered'}
+                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="openEnglishInvoice('${ord.orderId}')" class="bg-slate-900 text-amber-400 font-bold text-xs px-3 py-2 rounded-lg">
+                                <i class="fa-solid fa-file-invoice mr-1"></i> Cash Memo
+                            </button>
+                            ${!ord.isManual && ord.customer.phone ? `
+                                <a href="${waLink}" target="_blank" class="bg-emerald-600 text-white font-bold text-xs px-3 py-2 rounded-lg"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderSalesReport() {
+            const dateInput = document.getElementById('reportDateFilter');
+            const tbody = document.getElementById('salesReportTable');
+            if (!dateInput || !tbody) return;
+
+            const selectedDate = dateInput.value;
+            tbody.innerHTML = '';
+
+            let totalRev = 0;
+            let orderCount = 0;
+            let totalItems = 0;
+
+            const filteredOrders = orders.filter(ord => {
+                if (!ord.isDelivered) return false;
+                
+                if (ord.deliveredDate) {
+                    return ord.deliveredDate === selectedDate;
+                } else {
+                    const orderDateIso = convertUkDateToIso(ord.date);
+                    return orderDateIso === selectedDate;
+                }
+            });
+
+            if (filteredOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-400 font-bold">No sales or delivered orders on ${selectedDate}!</td></tr>`;
+                document.getElementById('reportTotalRevenue').innerText = `৳ 0`;
+                document.getElementById('reportOrderCount').innerText = `0`;
+                document.getElementById('reportItemsCount').innerText = `0 Pcs`;
+                return;
+            }
+
+            filteredOrders.forEach(ord => {
+                totalRev += ord.total;
+                orderCount += 1;
+
+                ord.items.forEach(item => {
+                    totalItems += item.qty;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-amber-50/50 transition";
+                    tr.innerHTML = `
+                        <td class="p-3 font-bold text-slate-900 font-english">${ord.orderId}</td>
+                        <td class="p-3">
+                            ${ord.isManual ? 
+                                '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded">POS Manual</span>' : 
+                                '<span class="bg-blue-100 text-blue-800 text-[10px] font-extrabold px-2 py-0.5 rounded">Online COD</span>'
+                            }
+                        </td>
+                        <td class="p-3 font-bold text-slate-800">
+                            ${item.title} <br>
+                            <span class="text-[11px] text-amber-700 font-english">Batch: <strong>${item.batch}</strong></span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="bg-gray-100 font-bold px-2 py-0.5 rounded text-slate-800">${item.selectedSize}</span>
+                            <span class="text-gray-500 font-bold ml-1">× ${item.qty}</span>
+                        </td>
+                        <td class="p-3 text-right font-black text-amber-600 font-english">৳ ${item.price * item.qty}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+
+            document.getElementById('reportTotalRevenue').innerText = `৳ ${totalRev}`;
+            document.getElementById('reportOrderCount').innerText = `${orderCount}`;
+            document.getElementById('reportItemsCount').innerText = `${totalItems} Pcs`;
+        }
+
+        function openReportPrintModal() {
+            const dateInput = document.getElementById('reportDateFilter');
+            if (!dateInput) return;
+            const selectedDate = dateInput.value;
+
+            document.getElementById('printReportDate').innerText = `Date: ${selectedDate}`;
+
+            const filteredOrders = orders.filter(ord => {
+                if (!ord.isDelivered) return false;
+                if (ord.deliveredDate) {
+                    return ord.deliveredDate === selectedDate;
+                } else {
+                    return convertUkDateToIso(ord.date) === selectedDate;
+                }
+            });
+
+            let totalRev = 0;
+            let orderCount = filteredOrders.length;
+            let totalItems = 0;
+
+            const tbody = document.getElementById('printReportTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredOrders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 font-bold">No sales recorded on ${selectedDate}</td></tr>`;
+            } else {
+                filteredOrders.forEach(ord => {
+                    totalRev += ord.total;
+                    ord.items.forEach(item => {
+                        totalItems += item.qty;
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="p-2.5 border-b font-bold font-english">${ord.orderId}</td>
+                            <td class="p-2.5 border-b font-bold">${ord.isManual ? 'POS Manual' : 'Online COD'}</td>
+                            <td class="p-2.5 border-b font-bold">${item.title} <span class="text-amber-800 font-normal">(Batch: ${item.batch})</span></td>
+                            <td class="p-2.5 border-b text-center font-bold">${item.selectedSize} × ${item.qty}</td>
+                            <td class="p-2.5 border-b text-right font-bold font-english">BDT ${item.price * item.qty}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+            }
+
+            document.getElementById('printReportRev').innerText = `BDT ${totalRev}`;
+            document.getElementById('printReportOrders').innerText = `${orderCount}`;
+            document.getElementById('printReportItems').innerText = `${totalItems} Pcs`;
+
+            document.getElementById('printableReportModal').classList.remove('hidden');
+        }
+
+        function closeReportPrintModal() {
+            document.getElementById('printableReportModal').classList.add('hidden');
+        }
+
+        function convertUkDateToIso(ukDateStr) {
+            if (!ukDateStr) return '';
+            const parts = ukDateStr.split('/');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+            return ukDateStr;
+        }
+
+        function openEnglishInvoice(orderId) {
+            const order = orders.find(o => o.orderId === orderId);
+            if (!order) return;
+
+            document.getElementById('invOrderId').innerText = `INVOICE: #${order.orderId}`;
+            document.getElementById('invDate').innerText = `Date: ${order.date}`;
+            document.getElementById('invCustName').innerText = order.customer.name || 'Walk-in Customer';
+            document.getElementById('invCustPhone').innerText = `Phone: ${order.customer.phone || 'N/A'}`;
+            document.getElementById('invCustAddress').innerText = `Address: ${order.customer.address || 'Direct Over The Counter'}`;
+
+            const tbody = document.getElementById('invItemsTable');
+            tbody.innerHTML = '';
+            order.items.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5 border-b font-bold">${idx + 1}</td>
+                    <td class="p-2.5 border-b font-bold text-slate-900">${item.title}</td>
+                    <td class="p-2.5 border-b text-center font-semibold text-amber-800">${item.batch}</td>
+                    <td class="p-2.5 border-b text-center font-bold">${item.selectedSize}</td>
+                    <td class="p-2.5 border-b text-center">${item.qty}</td>
+                    <td class="p-2.5 border-b text-right">BDT ${item.price}</td>
+                    <td class="p-2.5 border-b text-right font-bold">BDT ${item.price * item.qty}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('invSubtotal').innerText = `BDT ${order.subtotal}`;
+            document.getElementById('invDeliveryFee').innerText = `BDT ${order.deliveryFee}`;
+            document.getElementById('invGrandTotal').innerText = `BDT ${order.total}`;
+            document.getElementById('printableInvoiceModal').classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('printableInvoiceModal').classList.add('hidden');
+        }
+
+        function triggerInvoicePrint() {
+            window.print();
+        }
+
+        function deleteSingleOrder(orderId) {
+            if (currentUserRole !== 'admin') return alert("Only Admin can delete!");
+            if (confirm('Delete this order?')) db.ref('orders/' + orderId).remove();
+        }
+
+        function updateOrderBadge() {
+            document.getElementById('orderBadge').innerText = orders.length;
+        }
+
+        function clearAllOrders() {
+            if (currentUserRole !== 'admin') return alert("Only Admin can clear order history!");
+            if (confirm('Clear all order history?')) db.ref('orders').remove();
+        }
+
+        function filterCategory(catName) {
+            activeCategory = catName;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = btn.getAttribute('data-cat') === catName ? 
+                    "cat-btn font-bold text-xs sm:text-sm px-5 py-2 rounded-xl border border-amber-500 bg-slate-900 text-amber-400 whitespace-nowrap transition shadow-sm flex items-center gap-2" : 
+                    "cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2";
+            });
+            document.getElementById('categoryHeader').innerText = `${catName} Collection`;
+            renderProducts();
+        }
+
+        function handleSortChange() {
+            activeSortOption = document.getElementById('sortSelect').value;
+            renderProducts();
+        }
+
+        function handleSearch() {
+            renderProducts(document.getElementById('searchInput').value);
+        }
+
+        function handleSearchMobile() {
+            renderProducts(document.getElementById('searchInputMobile').value);
+        }
+
+        function toggleMobileSearch() {
+            document.getElementById('mobileSearchBox').classList.toggle('hidden');
+        }
+
+        function sendWhatsAppDirectMessage(e) {
+            e.preventDefault();
+            const name = document.getElementById('waCustName').value;
+            const phone = document.getElementById('waCustPhone').value;
+            const msg = document.getElementById('waCustMessage').value;
+            const text = `Assalamu Alaikum!\nName: ${name}\nPhone: ${phone}\nMessage: ${msg}`;
+            window.open(`https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function scrollToProducts() {
+            document.getElementById('productsSection')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
