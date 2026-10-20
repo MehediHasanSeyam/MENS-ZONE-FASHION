@@ -1312,6 +1312,7 @@
                 orders = data ? Object.values(data) : [];
                 updateOrderBadge();
                 renderSalesReport();
+                renderAdminOrders();
             });
         }
 
@@ -1383,19 +1384,36 @@
             });
         }
 
+        // UPDATE 1: AUTOMATIC WHATSAPP MESSAGE WHEN MARKED AS DELIVERED
         function toggleDeliveryStatus(orderId, currentStatus) {
             const todayIso = new Date().toISOString().split('T')[0];
+            const willBeDelivered = !currentStatus;
             const updates = {
-                isDelivered: !currentStatus,
-                status: !currentStatus ? 'Delivered' : 'Pending',
-                deliveredDate: !currentStatus ? todayIso : null
+                isDelivered: willBeDelivered,
+                status: willBeDelivered ? 'Delivered' : 'Pending',
+                deliveredDate: willBeDelivered ? todayIso : null
             };
 
-            db.ref('orders/' + orderId).update(updates);
+            db.ref('orders/' + orderId).update(updates).then(() => {
+                if (willBeDelivered) {
+                    const ord = orders.find(o => o.orderId === orderId);
+                    if (ord && ord.customer && ord.customer.phone && ord.customer.phone !== 'N/A' && !ord.isManual) {
+                        let cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
+                        if (cleanPhone.startsWith('0')) cleanPhone = '88' + cleanPhone;
+
+                        const deliveryMsg = `আসসালামু আলাইকুম। 😊\nআপনার পণ্যটি সফলভাবে ডেলিভারি সম্পন্ন হয়েছে। ❤️\n\n📦 রিটার্ন পলিসি — MENS ZONE FASHION\nপণ্য হাতে পাওয়ার পর কোনো সমস্যা থাকলে বা রিটার্ন করতে চাইলে, ডেলিভারির তারিখ থেকে ৩ দিনের মধ্যে আমাদের জানাতে হবে।\n\n✅ রিটার্নের জন্য ৩ দিনের মধ্যে আমাদের সাথে যোগাযোগ করতে হবে।\n✅ রিটার্নের কারণ স্পষ্টভাবে জানাতে হবে।\n\n⚠️ বিশেষ দ্রষ্টব্য: ডেলিভারির তারিখ থেকে ৩ দিন পার হয়ে গেলে আর কোনো রিটার্নের অনুরোধ গ্রহণ করা হবে না।\n\nআমাদের কাছ থেকে কেনাকাটা করার জন্য আন্তরিক ধন্যবাদ। ❤️\n\nধন্যবাদান্তে,\nMENS ZONE FASHION 👔🛍️`;
+
+                        const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(deliveryMsg)}`;
+                        window.open(waLink, '_blank');
+                    }
+                }
+            });
         }
 
+        // UPDATE 2: ORDER CONFIRMATION & DELIVERED TICK MARK BUTTON
         function renderAdminOrders() {
             const container = document.getElementById('ordersListContainer');
+            if (!container) return;
             container.innerHTML = '';
             if (orders.length === 0) {
                 container.innerHTML = `<div class="text-center py-10 text-gray-400"><p>No orders yet!</p></div>`;
@@ -1409,7 +1427,7 @@
                 let cleanPhone = ord.customer.phone ? ord.customer.phone.replace(/[^0-9]/g, '') : '';
                 if (cleanPhone.startsWith('0')) cleanPhone = '88' + cleanPhone;
 
-                const customBanglaMsg = `আসসালামু আলাইকুম। 😊\nআপনার অর্ডারটি আমরা পেয়েছি। অনুগ্রহ করে অর্ডারটি কনফার্ম করুন। অর্ডার কনফার্ম করার পর আগামী ৩–৫ দিনের মধ্যে আপনার পণ্যটি পৌঁছে দেওয়া হবে, ইনশাআল্লাহ। ❤️\nআমাদের সাথে থাকার জন্য ধন্যবাদ। 🛍️`;
+                const customBanglaMsg = `আসসালামু আলাইকুম। 😊\nআপনার অর্ডারটি আমরা পেয়েছি। অনুগ্রহ করে অর্ডারটি কনফার্ম করুন। অর্ডার কনফার্ম করার পর আগামী ৩–৫ দিনের মধ্যে আপনার পণ্যটি পৌঁছে দেওয়া হবে, ইনশাআল্লাহ। ❤️\nআমাদের সাথে থাকার জন্য আন্তরিক ধন্যবাদ। 🛍️\n\nধন্যবাদান্তে,\nMENS ZONE FASHION 👔✨`;
                 const waMessage = encodeURIComponent(customBanglaMsg);
                 const waLink = `https://wa.me/${cleanPhone}?text=${waMessage}`;
 
@@ -1419,11 +1437,11 @@
                             <span class="font-extrabold text-slate-900 font-english">${ord.orderId}</span>
                             ${ord.isManual ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded ml-2">Direct Sale</span>' : ''}
                             <span class="text-xs text-gray-500 ml-2 font-english">🕒 Order Date: ${ord.date}</span>
-                            ${ord.deliveredDate ? `<span class="text-xs text-emerald-700 ml-2 font-bold font-english">✔ Delivered: ${ord.deliveredDate}</span>` : ''}
+                            ${ord.deliveredDate ? `<span class="text-xs text-emerald-700 ml-2 font-bold font-english"><i class="fa-solid fa-square-check text-emerald-600"></i> Delivered: ${ord.deliveredDate}</span>` : ''}
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold px-2.5 py-1 rounded-full ${ord.isDelivered ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                                ${ord.isDelivered ? '✔ Delivered' : '⏳ Pending'}
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-full ${ord.isDelivered ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'} flex items-center gap-1">
+                                ${ord.isDelivered ? '<i class="fa-solid fa-square-check text-emerald-600"></i> Delivered' : '⏳ Pending'}
                             </span>
                             ${currentUserRole === 'admin' ? `
                                 <button onclick="deleteSingleOrder('${ord.orderId}')" class="text-xs text-red-500 p-1"><i class="fa-solid fa-trash"></i></button>
@@ -1448,8 +1466,8 @@
                     </div>
 
                     <div class="pt-2 flex justify-between items-center border-t">
-                        <button onclick="toggleDeliveryStatus('${ord.orderId}', ${ord.isDelivered})" class="${ord.isDelivered ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700'} font-bold text-xs px-3.5 py-2 rounded-lg">
-                            ${ord.isDelivered ? '✔ Delivered (Tick Marked)' : 'Mark as Delivered'}
+                        <button onclick="toggleDeliveryStatus('${ord.orderId}', ${ord.isDelivered})" class="${ord.isDelivered ? 'bg-emerald-600 text-white' : 'bg-gray-100 hover:bg-emerald-50 text-gray-700 hover:text-emerald-700'} font-bold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition">
+                            ${ord.isDelivered ? '<i class="fa-solid fa-square-check text-white text-sm"></i> Delivered (Tick Marked)' : '<i class="fa-regular fa-square text-gray-500 text-sm"></i> Mark as Delivered'}
                         </button>
                         <div class="flex gap-2">
                             <button onclick="openEnglishInvoice('${ord.orderId}')" class="bg-slate-900 text-amber-400 font-bold text-xs px-3 py-2 rounded-lg">
