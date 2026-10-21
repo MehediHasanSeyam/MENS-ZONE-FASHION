@@ -119,22 +119,11 @@
         </div>
     </header>
 
-    <!-- Navigation Categories Bar -->
+    <!-- Dynamic Navigation Categories Bar -->
     <nav class="bg-white border-b border-gray-200 sticky top-20 z-30 shadow-sm no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between overflow-x-auto py-3 gap-2 scrollbar-none">
-            <div class="flex items-center gap-2">
-                <button onclick="filterCategory('Panjabi')" class="cat-btn font-bold text-xs sm:text-sm px-5 py-2 rounded-xl border border-amber-500 bg-slate-900 text-amber-400 whitespace-nowrap transition shadow-sm flex items-center gap-2" data-cat="Panjabi">
-                    <span>👑</span> Panjabi
-                </button>
-                <button onclick="filterCategory('T-Shirt')" class="cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2" data-cat="T-Shirt">
-                    <span>👕</span> T-Shirt
-                </button>
-                <button onclick="filterCategory('Polo Shirt')" class="cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2" data-cat="Polo Shirt">
-                    <span>👔</span> Polo Shirt
-                </button>
-                <button onclick="filterCategory('Shirt')" class="cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2" data-cat="Shirt">
-                    <span>👔</span> Shirt
-                </button>
+            <div id="categoryNavButtons" class="flex items-center gap-2">
+                <!-- Dynamic Category Buttons Auto Rendered Here -->
             </div>
 
             <!-- Sorting Select Dropdown -->
@@ -162,7 +151,7 @@
                 Upgrade Your Style, <span class="gold-text">Define Your Identity.</span>
             </h2>
             <p class="text-sm sm:text-base text-gray-300 max-w-2xl font-light">
-                Exclusive collection of premium Panjabi, T-Shirts, Polo Shirts & Shirts. Fine fabrics, perfect fits, and elevated everyday style.
+                Exclusive collection of premium Panjabi, T-Shirts, Polo Shirts, Shirts & Accessories. Fine fabrics, perfect fits, and elevated everyday style.
             </p>
             <button onclick="scrollToProducts()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-xl transition transform hover:-translate-y-0.5 flex items-center gap-2">
                 <span>Shop Now</span> <i class="fa-solid fa-arrow-right-long text-xs" aria-hidden="true"></i>
@@ -226,6 +215,37 @@
             © 2026 <span class="text-amber-400 font-bold">MENS ZONE FASHION</span>. All Rights Reserved.
         </div>
     </footer>
+
+    <!-- ADD NEW CATEGORY MODAL (FIXED Z-INDEX TO z-[60]) -->
+    <div id="newCategoryModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
+            <button onclick="toggleCategoryModal()" class="absolute top-4 right-4 text-gray-400 hover:text-slate-900 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl mb-2 font-black">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <h3 class="text-xl font-black text-slate-900">Add New Category / Item</h3>
+                <p class="text-xs text-gray-500">Create a custom item category for your shop</p>
+            </div>
+
+            <form onsubmit="handleCreateCategory(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Category Name *</label>
+                    <input type="text" id="newCatName" required placeholder="e.g. Jeans, Kabli, Jacket, Shoes" class="w-full px-3 py-2 border rounded-lg text-xs font-bold text-slate-800 outline-none focus:ring-1 focus:ring-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Category Icon / Emoji (Optional)</label>
+                    <input type="text" id="newCatIcon" placeholder="e.g. 👖 or 🧥 or 👟" class="w-full px-3 py-2 border rounded-lg text-xs outline-none focus:ring-1 focus:ring-amber-500">
+                </div>
+
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold py-2.5 rounded-xl text-xs shadow transition">
+                    <i class="fa-solid fa-plus-circle mr-1"></i> Save New Category
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- STRICT USERNAME & PASSWORD LOGIN MODAL (ADMIN / MANAGER / STAFF) -->
     <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
@@ -384,17 +404,19 @@
             <div class="p-6 overflow-y-auto flex-1 bg-gray-50">
                 <!-- Tab 1: Upload Product -->
                 <div id="adminAddSection" class="space-y-4 max-w-2xl mx-auto bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-base font-bold text-slate-900 border-b pb-2">Save Product with Details & Image</h4>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h4 class="text-base font-bold text-slate-900">Save Product with Details & Image</h4>
+                        <button type="button" onclick="toggleCategoryModal()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                            <i class="fa-solid fa-plus-circle"></i> New Category
+                        </button>
+                    </div>
                     
                     <form id="addProductForm" onsubmit="handleSaveProduct(event)" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="prodCategory" class="block text-xs font-bold text-gray-700 mb-1">Select Category *</label>
                                 <select id="prodCategory" required onchange="handleCategoryChange()" class="w-full px-3 py-2 border rounded-lg text-sm bg-white font-bold focus:ring-2 focus:ring-amber-500 outline-none">
-                                    <option value="Panjabi">👑 Panjabi</option>
-                                    <option value="T-Shirt">👕 T-Shirt</option>
-                                    <option value="Polo Shirt">👔 Polo Shirt</option>
-                                    <option value="Shirt">👔 Shirt</option>
+                                    <!-- Dynamic Category Options Rendered Here -->
                                 </select>
                             </div>
                             <div>
@@ -432,7 +454,7 @@
                             </div>
 
                             <div id="standardSizesBox" class="space-y-1 hidden">
-                                <p class="text-xs text-blue-700 font-bold mb-1">T-Shirt / Polo / Shirt Size:</p>
+                                <p class="text-xs text-blue-700 font-bold mb-1">Standard Item Sizes:</p>
                                 <div class="flex flex-wrap gap-4 text-sm">
                                     <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="M" class="w-4 h-4 text-amber-500 rounded" checked> M</label>
                                     <label class="flex items-center gap-1.5 cursor-pointer font-bold"><input type="checkbox" name="sizes" value="L" class="w-4 h-4 text-amber-500 rounded" checked> L</label>
@@ -557,10 +579,6 @@
                                 <label for="manualCategory" class="block text-xs font-bold text-gray-700 mb-1">1. Select Category *</label>
                                 <select id="manualCategory" onchange="handleManualCategoryChange()" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white font-bold outline-none">
                                     <option value="">-- Select Category --</option>
-                                    <option value="Panjabi">👑 Panjabi</option>
-                                    <option value="T-Shirt">👕 T-Shirt</option>
-                                    <option value="Polo Shirt">👔 Polo Shirt</option>
-                                    <option value="Shirt">👔 Shirt</option>
                                 </select>
                             </div>
 
@@ -731,7 +749,7 @@
             <div class="flex justify-between items-start border-b border-gray-200 pb-4">
                 <div>
                     <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">MENS ZONE FASHION</h2>
-                    <p class="text-xs text-gray-500 mt-1">Premium Panjabi, Shirt, Polo & T-Shirt Collection</p>
+                    <p class="text-xs text-gray-500 mt-1">Premium Collection & Accessories Store</p>
                     <p class="text-xs text-gray-500">Dhaka, Bangladesh | Cash On Delivery Service</p>
                 </div>
                 <div class="text-right">
@@ -816,6 +834,16 @@
         let products = [];
         let cart = [];
         let orders = [];
+        
+        // Default categories list
+        const defaultCategories = [
+            { name: 'Panjabi', icon: '👑' },
+            { name: 'T-Shirt', icon: '👕' },
+            { name: 'Polo Shirt', icon: '👔' },
+            { name: 'Shirt', icon: '👔' }
+        ];
+        let categories = [...defaultCategories];
+
         let activeCategory = 'Panjabi'; 
         let activeSortOption = 'default';
         let currentUploadedImageData = '';
@@ -823,6 +851,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             listenToAuthChanges();
+            loadCategoriesFromCloud();
             loadProductsFromCloud();
             loadOrdersFromCloud();
             
@@ -830,6 +859,101 @@
             const dateInput = document.getElementById('reportDateFilter');
             if (dateInput) dateInput.value = todayIso;
         });
+
+        // DYNAMIC CATEGORY ENGINE
+        function loadCategoriesFromCloud() {
+            db.ref('categories').on('value', snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    const customCats = Object.values(data);
+                    const defaultNames = new Set(defaultCategories.map(c => c.name));
+                    const uniqueCustoms = customCats.filter(c => !defaultNames.has(c.name));
+                    categories = [...defaultCategories, ...uniqueCustoms];
+                } else {
+                    categories = [...defaultCategories];
+                }
+                renderCategoriesUI();
+            });
+        }
+
+        function renderCategoriesUI() {
+            // 1. Render Top Nav Buttons
+            const navBox = document.getElementById('categoryNavButtons');
+            if (navBox) {
+                navBox.innerHTML = '';
+                categories.forEach(cat => {
+                    const isActive = cat.name === activeCategory;
+                    const btn = document.createElement('button');
+                    btn.onclick = () => filterCategory(cat.name);
+                    btn.className = isActive ? 
+                        "cat-btn font-bold text-xs sm:text-sm px-5 py-2 rounded-xl border border-amber-500 bg-slate-900 text-amber-400 whitespace-nowrap transition shadow-sm flex items-center gap-2" : 
+                        "cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2";
+                    btn.setAttribute('data-cat', cat.name);
+                    btn.innerHTML = `<span>${cat.icon || '🛍️'}</span> ${cat.name}`;
+                    navBox.appendChild(btn);
+                });
+            }
+
+            // 2. Render Product Upload Dropdown
+            const prodCatSelect = document.getElementById('prodCategory');
+            if (prodCatSelect) {
+                const currentVal = prodCatSelect.value;
+                prodCatSelect.innerHTML = '';
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.name;
+                    opt.textContent = `${cat.icon || '🛍️'} ${cat.name}`;
+                    prodCatSelect.appendChild(opt);
+                });
+                if (currentVal && categories.some(c => c.name === currentVal)) {
+                    prodCatSelect.value = currentVal;
+                }
+            }
+
+            // 3. Render Manual POS Dropdown
+            const manualCatSelect = document.getElementById('manualCategory');
+            if (manualCatSelect) {
+                const currentVal = manualCatSelect.value;
+                manualCatSelect.innerHTML = '<option value="">-- Select Category --</option>';
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.name;
+                    opt.textContent = `${cat.icon || '🛍️'} ${cat.name}`;
+                    manualCatSelect.appendChild(opt);
+                });
+                if (currentVal && categories.some(c => c.name === currentVal)) {
+                    manualCatSelect.value = currentVal;
+                }
+            }
+        }
+
+        function toggleCategoryModal() {
+            document.getElementById('newCategoryModal').classList.toggle('hidden');
+        }
+
+        function handleCreateCategory(e) {
+            e.preventDefault();
+            if (!['admin', 'manager'].includes(currentUserRole)) return alert("Permission Denied!");
+
+            const catName = document.getElementById('newCatName').value.trim();
+            const catIcon = document.getElementById('newCatIcon').value.trim() || '🛍️';
+
+            if (!catName) return alert('Enter Category Name!');
+
+            const exists = categories.some(c => c.name.toLowerCase() === catName.toLowerCase());
+            if (exists) return alert('Category already exists!');
+
+            const catId = 'cat-' + Date.now();
+            const newCat = { id: catId, name: catName, icon: catIcon };
+
+            db.ref('categories/' + catId).set(newCat).then(() => {
+                alert(`Category "${catName}" added successfully!`);
+                document.getElementById('newCatName').value = '';
+                document.getElementById('newCatIcon').value = '';
+                toggleCategoryModal();
+                filterCategory(catName);
+            });
+        }
 
         // AUTH & ROLE OBSERVER (PURE FIREBASE AUTHENTICATION ONLY)
         function listenToAuthChanges() {
@@ -842,7 +966,7 @@
                     currentUser = user;
                     db.ref('users/' + user.uid).once('value').then(snapshot => {
                         const userData = snapshot.val();
-                        currentUserRole = userData ? userData.role : 'admin'; // Defaults to admin if root account
+                        currentUserRole = userData ? userData.role : 'admin';
 
                         if (['admin', 'manager', 'staff'].includes(currentUserRole)) {
                             document.getElementById('roleLabel').innerText = currentUserRole;
@@ -916,7 +1040,6 @@
             document.getElementById('authModal').classList.toggle('hidden');
         }
 
-        // PURE FIREBASE AUTHENTICATION LOGIN
         function handleAuthSubmit(e) {
             e.preventDefault();
             let usernameInput = document.getElementById('authUsername').value.trim();
@@ -936,7 +1059,6 @@
                 });
         }
 
-        // CHANGE PASSWORD DIRECTLY IN FIREBASE AUTHENTICATION
         function handleChangeAdminCredentials(e) {
             e.preventDefault();
             if (currentUserRole !== 'admin') return alert("Only Admin can change credentials!");
@@ -1384,7 +1506,6 @@
             });
         }
 
-        // UPDATE 1: AUTOMATIC WHATSAPP MESSAGE WHEN MARKED AS DELIVERED
         function toggleDeliveryStatus(orderId, currentStatus) {
             const todayIso = new Date().toISOString().split('T')[0];
             const willBeDelivered = !currentStatus;
@@ -1410,7 +1531,6 @@
             });
         }
 
-        // UPDATE 2: ORDER CONFIRMATION & DELIVERED TICK MARK BUTTON
         function renderAdminOrders() {
             const container = document.getElementById('ordersListContainer');
             if (!container) return;
@@ -1669,11 +1789,7 @@
 
         function filterCategory(catName) {
             activeCategory = catName;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = btn.getAttribute('data-cat') === catName ? 
-                    "cat-btn font-bold text-xs sm:text-sm px-5 py-2 rounded-xl border border-amber-500 bg-slate-900 text-amber-400 whitespace-nowrap transition shadow-sm flex items-center gap-2" : 
-                    "cat-btn font-medium text-xs sm:text-sm px-5 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-amber-50 whitespace-nowrap transition flex items-center gap-2";
-            });
+            renderCategoriesUI();
             document.getElementById('categoryHeader').innerText = `${catName} Collection`;
             renderProducts();
         }
