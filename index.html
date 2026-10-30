@@ -609,9 +609,14 @@
                                 <input type="number" id="manualPrice" required placeholder="Price auto-fills" class="w-full px-3 py-2 border rounded-lg text-sm font-bold text-emerald-800 bg-emerald-50 outline-none">
                             </div>
                             <div>
-                                <label for="manualCustName" class="block text-xs font-bold text-gray-700 mb-1">Customer Name (Optional)</label>
-                                <input type="text" id="manualCustName" placeholder="Counter Sale" class="w-full px-3 py-2 border rounded-lg text-sm outline-none">
+                                <label for="manualCustName" class="block text-xs font-bold text-gray-700 mb-1">Customer Name *</label>
+                                <input type="text" id="manualCustName" required placeholder="Enter Customer Name" class="w-full px-3 py-2 border rounded-lg text-sm outline-none font-bold text-slate-800">
                             </div>
+                        </div>
+
+                        <div>
+                            <label for="manualCustPhone" class="block text-xs font-bold text-gray-700 mb-1">Customer Phone Number * (11 Digits)</label>
+                            <input type="tel" id="manualCustPhone" required placeholder="017XXXXXXXX" class="w-full px-3 py-2 border rounded-lg text-sm outline-none font-bold text-slate-800">
                         </div>
 
                         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm shadow">
@@ -733,12 +738,16 @@
         </div>
     </div>
 
-    <!-- PRINTABLE ENGLISH CASH MEMO MODAL -->
+    <!-- PRINTABLE ENGLISH CASH MEMO MODAL (WITH DIRECT WHATSAPP BUTTON) -->
     <div id="printableInvoiceModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 sm:p-8 font-english text-slate-900 space-y-6 relative border">
             <div class="flex justify-between items-center border-b pb-4 no-print">
                 <span class="text-xs font-bold uppercase tracking-wider text-amber-600"><i class="fa-solid fa-receipt mr-1"></i> English Cash Memo Preview</span>
                 <div class="flex items-center gap-2">
+                    <!-- DIRECT WHATSAPP BUTTON ON CASH MEMO -->
+                    <button onclick="sendInvoiceWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                    </button>
                     <button onclick="triggerInvoicePrint()" class="bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-amber-400 font-bold text-xs px-4 py-2 rounded-lg transition flex items-center gap-2 shadow">
                         <i class="fa-solid fa-print"></i> Print Memo / Save PDF
                     </button>
@@ -834,6 +843,7 @@
         let products = [];
         let cart = [];
         let orders = [];
+        let activeInvoiceOrderId = null;
         
         // Default categories list
         const defaultCategories = [
@@ -1476,7 +1486,12 @@
             const size = document.getElementById('manualSelectSize').value;
             const qty = parseInt(document.getElementById('manualQty').value);
             const price = parseInt(document.getElementById('manualPrice').value);
-            const custName = document.getElementById('manualCustName').value || 'Walk-in Customer';
+            const custName = document.getElementById('manualCustName').value.trim();
+            const custPhone = document.getElementById('manualCustPhone').value.trim();
+
+            if (!custName || !custPhone) {
+                return alert('Customer Name and Phone Number are required!');
+            }
 
             const product = products.find(p => p.id === prodId);
             if (!product) return alert('Select product batch!');
@@ -1489,7 +1504,7 @@
                 orderId: posId,
                 date: new Date().toLocaleDateString('en-GB'),
                 deliveredDate: todayIso,
-                customer: { name: custName, phone: 'N/A', address: 'Direct Store Sale' },
+                customer: { name: custName, phone: custPhone, address: 'Direct Store Sale (Counter)' },
                 items: [{ id: product.id, title: product.title, batch: product.batch, price: price, image: product.image, category: product.category, selectedSize: size, qty: qty }],
                 deliveryFee: 0,
                 subtotal: total,
@@ -1500,9 +1515,11 @@
             };
 
             db.ref('orders/' + posId).set(manualOrder).then(() => {
-                alert('POS Sale Saved!');
+                if (!orders.some(o => o.orderId === posId)) {
+                    orders.push(manualOrder);
+                }
                 document.getElementById('manualSellForm').reset();
-                switchAdminTab('report');
+                openEnglishInvoice(posId);
             });
         }
 
@@ -1518,7 +1535,7 @@
             db.ref('orders/' + orderId).update(updates).then(() => {
                 if (willBeDelivered) {
                     const ord = orders.find(o => o.orderId === orderId);
-                    if (ord && ord.customer && ord.customer.phone && ord.customer.phone !== 'N/A' && !ord.isManual) {
+                    if (ord && ord.customer && ord.customer.phone && ord.customer.phone !== 'N/A') {
                         let cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
                         if (cleanPhone.startsWith('0')) cleanPhone = '88' + cleanPhone;
 
@@ -1544,7 +1561,7 @@
                 const card = document.createElement('div');
                 card.className = `bg-white border rounded-xl p-4 shadow-sm space-y-3 ${ord.isDelivered ? 'border-emerald-500/50 bg-emerald-50/20' : ''}`;
 
-                let cleanPhone = ord.customer.phone ? ord.customer.phone.replace(/[^0-9]/g, '') : '';
+                let cleanPhone = ord.customer && ord.customer.phone ? ord.customer.phone.replace(/[^0-9]/g, '') : '';
                 if (cleanPhone.startsWith('0')) cleanPhone = '88' + cleanPhone;
 
                 const customBanglaMsg = `আসসালামু আলাইকুম। 😊\nআপনার অর্ডারটি আমরা পেয়েছি। অনুগ্রহ করে অর্ডারটি কনফার্ম করুন। অর্ডার কনফার্ম করার পর আগামী ৩–৫ দিনের মধ্যে আপনার পণ্যটি পৌঁছে দেওয়া হবে, ইনশাআল্লাহ। ❤️\nআমাদের সাথে থাকার জন্য আন্তরিক ধন্যবাদ। 🛍️\n\nধন্যবাদান্তে,\nMENS ZONE FASHION 👔✨`;
@@ -1593,8 +1610,8 @@
                             <button onclick="openEnglishInvoice('${ord.orderId}')" class="bg-slate-900 text-amber-400 font-bold text-xs px-3 py-2 rounded-lg">
                                 <i class="fa-solid fa-file-invoice mr-1"></i> Cash Memo
                             </button>
-                            ${!ord.isManual && ord.customer.phone ? `
-                                <a href="${waLink}" target="_blank" class="bg-emerald-600 text-white font-bold text-xs px-3 py-2 rounded-lg"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                            ${ord.customer && ord.customer.phone && ord.customer.phone !== 'N/A' ? `
+                                <a href="${waLink}" target="_blank" class="bg-emerald-600 text-white font-bold text-xs px-3 py-2 rounded-lg flex items-center gap-1"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
                             ` : ''}
                         </div>
                     </div>
@@ -1737,6 +1754,8 @@
             const order = orders.find(o => o.orderId === orderId);
             if (!order) return;
 
+            activeInvoiceOrderId = orderId;
+
             document.getElementById('invOrderId').innerText = `INVOICE: #${order.orderId}`;
             document.getElementById('invDate').innerText = `Date: ${order.date}`;
             document.getElementById('invCustName').innerText = order.customer.name || 'Walk-in Customer';
@@ -1767,10 +1786,27 @@
 
         function closeInvoiceModal() {
             document.getElementById('printableInvoiceModal').classList.add('hidden');
+            activeInvoiceOrderId = null;
         }
 
         function triggerInvoicePrint() {
             window.print();
+        }
+
+        function sendInvoiceWhatsApp() {
+            if (!activeInvoiceOrderId) return alert("No active invoice found!");
+            const order = orders.find(o => o.orderId === activeInvoiceOrderId);
+            if (!order || !order.customer || !order.customer.phone || order.customer.phone === 'N/A') {
+                return alert("Customer phone number not available!");
+            }
+
+            let cleanPhone = order.customer.phone.replace(/[^0-9]/g, '');
+            if (cleanPhone.startsWith('0')) cleanPhone = '88' + cleanPhone;
+
+            const deliveryMsg = `আসসালামু আলাইকুম। 😊\nআপনার পণ্যটি সফলভাবে ডেলিভারি সম্পন্ন হয়েছে। ❤️\n\n📦 রিটার্ন পলিসি — MENS ZONE FASHION\nপণ্য হাতে পাওয়ার পর কোনো সমস্যা থাকলে বা রিটার্ন করতে চাইলে, ডেলিভারির তারিখ থেকে ৩ দিনের মধ্যে আমাদের জানাতে হবে।\n\n✅ রিটার্নের জন্য ৩ দিনের মধ্যে আমাদের সাথে যোগাযোগ করতে হবে।\n✅ রিটার্নের কারণ স্পষ্টভাবে জানাতে হবে।\n\n⚠️ বিশেষ দ্রষ্টব্য: ডেলিভারির তারিখ থেকে ৩ দিন পার হয়ে গেলে আর কোনো রিটার্নের অনুরোধ গ্রহণ করা হবে না।\n\nআমাদের কাছ থেকে কেনাকাটা করার জন্য আন্তরিক ধন্যবাদ। ❤️\n\nধন্যবাদান্তে,\nMENS ZONE FASHION 👔🛍️`;
+
+            const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(deliveryMsg)}`;
+            window.open(waLink, '_blank');
         }
 
         function deleteSingleOrder(orderId) {
@@ -1779,7 +1815,9 @@
         }
 
         function updateOrderBadge() {
-            document.getElementById('orderBadge').innerText = orders.length;
+            // Count ONLY Un-delivered / Pending orders
+            const pendingOrdersCount = orders.filter(o => !o.isDelivered).length;
+            document.getElementById('orderBadge').innerText = pendingOrdersCount;
         }
 
         function clearAllOrders() {
